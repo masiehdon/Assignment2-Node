@@ -4,7 +4,7 @@ const marked = require('marked');
 const moment = require('moment');
 const argParse = require('argparse');
 
-// Dispaly date
+// Display date
 
 const today = moment().format("YYYY-MM-DD");
 
