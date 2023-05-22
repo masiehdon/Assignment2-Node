@@ -6,49 +6,49 @@ const argParse = require('argparse');
 
 // Display date
 
-const today = moment().format("YYYY-MM-DD");
-
-const displayDate = function(){
-   return today
+const displayDate = function () {
+  const today = moment().format("YYYY-MM-DD");
+   console.log(today)
 };
 
-console.log(displayDate());
+displayDate();
 
 
-startDate = today;
-endDate = "2023-01-10"
+startDate = moment("2023-01-21", "YYYY-MM-DD");
+endDate = moment("2023-10-21", "YYYY-MM-DD");
 
- const differenceInDays = function(startDate, endDate){
-   const start = moment(startDate, 'YYYY-MM-DD');
-  const end = moment(endDate, 'YYYY-MM-DD');
-  const daysDifference = end.diff(start, 'days');
-if(daysDifference <= 0){
-    return `You started the course ${Math.abs(daysDifference)} days ago`}
-    else if(daysDifference > 0){
-return `Let´s not talk about the future!`
-    }
- }
+const differenceInDays = function (startDate, endDate) {
+  const daysDifference = endDate.diff(startDate, "days");
+  if (daysDifference <= 0) {
+    return `You started the course ${Math.abs(
+      daysDifference
+    )} days ago.`;
+  } else {
+    return "This date is in the future.";
+  }
+};
 
- const daysSinceCourseStart = differenceInDays(startDate, endDate);
+const daysSinceCourseStart = differenceInDays(startDate, endDate);
+console.log(daysSinceCourseStart);
 
  // Take date as user input and calculate the difference in days
 
 const userDate = process.argv[2];
+const now = moment();
 
-const date = moment(userDate);
-
-const differenceInputNow = function(now, userDate){
+const differenceInputNow = function (now, userDate) {
   userDate = moment(userDate, 'YYYY-MM-DD');
   now = moment(now, 'YYYY-MM-DD');
-  if(userDate.diff(now, 'days') <= 0){
-    console.log(`The date lies in the future.`)
-  }else{
-    console.log(`This date was ${userDate.diff(now, 'days')} days ago.`);
+  if (userDate.diff(now, 'days') > 0) {
+    console.log(`This date is in the future.`);
+  } else {
+    console.log(`This date was ${now.diff(userDate, 'days')} days ago.`);
   }
+};
 
-}
+differenceInputNow(now, userDate);
 
-differenceInputNow(date, today)
+
 
  function createHtmlFile(filename) {
 const htmlContent = `
@@ -72,33 +72,29 @@ fs.writeFile(`${filename}.html`, htmlContent, (err)=> {
   console.log(`Its done! ${filename}.html is created!`);
 })}
 
-createHtmlFile(`index`, `</p>`)
+createHtmlFile(`index`)
   
 
 ///////////////////////////////////////////
-/*
-const markdownContent = `# Hello, World!\n\nThis is some *Markdown* text.`;
+function generateIndexMarkdown() {
+  const markdownContent = `
+# My Index Page
 
-function createMarkdownFile(filename, markdownContent) {
+Welcome to my index page! This is some sample content.
 
-   htmlContent = marked(markdownContent);
-const fileContent = `<!DOCTYPE html>
-  <html>
-    <head>
-      <title>Markdown Content</title>
-      <meta charset="utf-8">
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/4.0.0/github-markdown.min.css">
-    </head>
-    <body class="markdown-body">
-      Some markdown content
-    </body>
-  </html>`;
- 
-  fs.writeFile(`${filename}.html`, fileContent, (err) => {
+## Section 1
+
+This is the first section of my index page.
+
+## Section 2
+
+This is the second section of my index page.
+`;
+
+  fs.writeFile("index.md", markdownContent, (err) => {
     if (err) throw err;
-    console.log(`${filename}.html file created`);
+    console.log("index.md file created");
   });
 }
 
-createMarkdownFile('myFile', markdownContent); 
-*/
+generateIndexMarkdown();
