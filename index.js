@@ -1,5 +1,11 @@
 const fs = require("fs");
-const moment = require('moment');
+const moment = require("moment");
+const { ArgumentParser } = require("argparse");
+
+// Create the argument parser
+const parser = new ArgumentParser();
+parser.add_argument("userDate", { help: "Specify a date (YYYY-MM-DD)" });
+const args = parser.parse_args();
 
 // Display current date
 const displayDate = async function () {
@@ -8,6 +14,7 @@ const displayDate = async function () {
   console.log(chalk.default.red(today)); // Update chalk usage to chalk.default.red
   writeToFile(today, "current-date.txt");
 };
+
 // Function to write data to a file
 const writeToFile = function (data, filename) {
   fs.writeFile(filename, data, function (err) {
@@ -24,7 +31,7 @@ displayDate();
 const startDate = moment("2023-01-25", "YYYY-MM-DD"); // Updated start date
 
 // Take date as user input and calculate the difference in days
-const userDate = process.argv[2]; // Read the date from command-line argument
+const userDate = args.userDate; // Use parsed userDate argument
 const now = moment();
 
 const differenceInputNow = function (now, userDate) {
