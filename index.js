@@ -1,11 +1,22 @@
 const fs = require("fs");
 const moment = require('moment');
-const chalk = require('chalk');
 
 // Display current date
-const displayDate = function () {
+const displayDate = async function () {
+  const chalk = await import('chalk');
   const today = moment().format("YYYY-MM-DD");
-  console.log(chalk.red(today));
+  console.log(chalk.default.red(today)); // Update chalk usage to chalk.default.red
+  writeToFile(today, "current-date.txt");
+};
+// Function to write data to a file
+const writeToFile = function (data, filename) {
+  fs.writeFile(filename, data, function (err) {
+    if (err) {
+      console.log(`Error writing to file: ${err}`);
+    } else {
+      console.log(`Data written to ${filename} successfully.`);
+    }
+  });
 };
 
 displayDate();
@@ -20,16 +31,17 @@ const differenceInputNow = function (now, userDate) {
   userDate = moment(userDate, 'YYYY-MM-DD');
   now = moment(now, 'YYYY-MM-DD');
   if (userDate.diff(now, 'days') > 0) {
-    console.log(chalk.green(`This date is in the future.`));
+    console.log(`This date is in the future.`);
   } else {
-    console.log(chalk.green(`This date was ${now.diff(userDate, 'days')} days ago.`));
+    console.log(`This date was ${now.diff(userDate, 'days')} days ago.`);
   }
+  writeToFile(userDate.format("YYYY-MM-DD"), "user-date.txt");
 };
 
 if (userDate) {
   differenceInputNow(now, userDate);
 } else {
-  console.log(chalk.red("Please provide a date as an argument."));
+  console.log("Please provide a date as an argument.");
 }
 
 // Function to calculate and display the duration since the course start
@@ -39,7 +51,34 @@ const durationSinceCourseStart = function () {
   const months = duration.months();
   const days = duration.days();
   
-  console.log(chalk.green(`It has been ${years} years, ${months} months, and ${days} days since you started the course.`));
+  console.log(`It has been ${years} years, ${months} months, and ${days} days since you started the course.`);
+  const durationString = `${years} years, ${months} months, and ${days} days`;
+  writeToFile(durationString, "course-duration.txt");
 };
 
 durationSinceCourseStart();
+
+// Function to generate and write HTML file
+const generateHTMLFile = function () {
+  const currentDate = moment().format("YYYY-MM-DD");
+  const courseDuration = moment().diff(startDate, 'days');
+  const htmlContent = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Date Management</title>
+        <style>
+          /* Add relevant CSS styling here */
+        </style>
+      </head>
+      <body>
+        <h1>Date Management</h1>
+        <p>Current Date: ${currentDate}</p>
+        <p>Course Duration: ${courseDuration} days</p>
+      </body>
+    </html>
+  `;
+  writeToFile(htmlContent, "index.html");
+};
+
+generateHTMLFile();
