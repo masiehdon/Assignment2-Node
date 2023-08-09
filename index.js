@@ -1,74 +1,72 @@
 const fs = require("fs");
-const moment = require("moment");
-const { ArgumentParser } = require("argparse");
+const { format, differenceInCalendarDays, differenceInCalendarMonths, differenceInCalendarYears, isBefore, isAfter, isEqual, startOfDay } = require("date-fns");
+const readline = require('readline');
 
-// Create the argument parser
-const parser = new ArgumentParser();
-parser.add_argument("userDate", { help: "Specify a date (YYYY-MM-DD)" });
-const args = parser.parse_args();
-
-// Display current date
-const displayDate = async function () {
-  const chalk = await import('chalk');
-  const today = moment().format("YYYY-MM-DD");
-  console.log(chalk.default.red(today)); // Update chalk usage to chalk.default.red
-  writeToFile(today, "current-date.txt");
-};
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
 // Function to write data to a file
 const writeToFile = function (data, filename) {
-  fs.writeFile(filename, data, function (err) {
-    if (err) {
-      console.log(`Error writing to file: ${err}`);
-    } else {
-      console.log(`Data written to ${filename} successfully.`);
-    }
-  });
+  fs.writeFileSync(filename, data);
+  console.log(`Data written to ${filename} successfully.`);
 };
 
-displayDate();
-
-const startDate = moment("2023-01-25", "YYYY-MM-DD"); // Updated start date
-
-// Take date as user input and calculate the difference in days
-const userDate = args.userDate; // Use parsed userDate argument
-const now = moment();
-
-const differenceInputNow = function (now, userDate) {
-  userDate = moment(userDate, 'YYYY-MM-DD');
-  now = moment(now, 'YYYY-MM-DD');
-  if (userDate.diff(now, 'days') > 0) {
-    console.log(`This date is in the future.`);
-  } else {
-    console.log(`This date was ${now.diff(userDate, 'days')} days ago.`);
-  }
-  writeToFile(userDate.format("YYYY-MM-DD"), "user-date.txt");
+// Function to calculate and write the current date and time
+const writeCurrentDateTime = function () {
+  const currentDateTime = format(new Date(), "yyyy-MM-dd HH:mm:ss");
+  writeToFile(currentDateTime, "current-date-time.txt");
 };
 
-if (userDate) {
-  differenceInputNow(now, userDate);
-} else {
-  console.log("Please provide a date as an argument.");
-}
+writeCurrentDateTime();
 
-// Function to calculate and display the duration since the course start
-const durationSinceCourseStart = function () {
-  const duration = moment.duration(moment().diff(startDate));
-  const years = duration.years();
-  const months = duration.months();
-  const days = duration.days();
-  
-  console.log(`It has been ${years} years, ${months} months, and ${days} days since you started the course.`);
+// Function to calculate and write the duration since the start of the course
+const writeCourseDuration = function () {
+  const startDate = new Date("2023-01-25");
+  const currentDate = new Date();
+  const years = differenceInCalendarYears(currentDate, startDate);
+  const months = differenceInCalendarMonths(currentDate, startDate) % 12;
+  const days = differenceInCalendarDays(currentDate, startDate) % 30; // Adjust this value if necessary
+
   const durationString = `${years} years, ${months} months, and ${days} days`;
   writeToFile(durationString, "course-duration.txt");
 };
 
-durationSinceCourseStart();
+writeCourseDuration();
 
-// Function to generate and write HTML file
+// Function to determine if provided date is before or after the current date
+const compareDates = function (userDate) {
+  const currentDate = new Date();
+  userDate = new Date(userDate);
+
+  if (isEqual(startOfDay(userDate), startOfDay(currentDate))) {
+    console.log(`The provided date is the same as the current date.`);
+  } else if (isBefore(startOfDay(userDate), startOfDay(currentDate))) {
+    console.log(`The provided date (${format(userDate, "yyyy-MM-dd")}) is before the current date.`);
+  } else if (isAfter(startOfDay(userDate), startOfDay(currentDate))) {
+    console.log(`The provided date (${format(userDate, "yyyy-MM-dd")}) is after the current date.`);
+  } else {
+    console.log(`Invalid date.`);
+  }
+};
+
+rl.question("Enter a date (YYYY-MM-DD): ", (userDate) => {
+  if (userDate) {
+    compareDates(userDate);
+  } else {
+    console.log("Please provide a date.");
+  }
+
+  rl.close();
+});
+
+// Generate and write HTML file
 const generateHTMLFile = function () {
-  const currentDate = moment().format("YYYY-MM-DD");
-  const courseDuration = moment().diff(startDate, 'days');
+  const startDate = new Date("2023-01-25");
+  const currentDate = new Date();
+  const courseDuration = differenceInCalendarDays(currentDate, startDate);
+
   const htmlContent = `
     <!DOCTYPE html>
     <html>
@@ -80,11 +78,12 @@ const generateHTMLFile = function () {
       </head>
       <body>
         <h1>Date Management</h1>
-        <p>Current Date: ${currentDate}</p>
+        <p>Current Date and Time: ${format(currentDate, "yyyy-MM-dd HH:mm:ss")}</p>
         <p>Course Duration: ${courseDuration} days</p>
       </body>
     </html>
   `;
+
   writeToFile(htmlContent, "index.html");
 };
 
