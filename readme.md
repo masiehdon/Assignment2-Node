@@ -17,3 +17,15 @@ This assignment aims to recreate and improve a codebase while fulfilling specifi
 2. `calculateDurationSinceCourseStart()`: Calculates and displays the duration since the start of the course.
 3. `differenceInputNow(now, userDate)`: Determines if the user-provided date is in the future or in the past.
 4. `writeToFile(data, filename)`: Writes the provided data to a file with the given filename.
+
+Usage
+Run the application:
+
+Follow the prompts to input a date and view the calculated information.
+
+Check the generated files in the project directory:
+
+current-date-time.txt - Contains the current date and time.
+course-duration.txt - Contains the duration since the start of the course.
+user-date.txt - Contains the provided user date.
+index.html - HTML report with date information.
